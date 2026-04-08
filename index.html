@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Path System Converter</title>
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <h1 class="main-title">Path System Converter</h1>
+
+        <div class="container">
+            <button onclick="processPath(1)">
+                Convert to Windows UNC Path
+            </button>
+            <button onclick="processPath(2)">Convert to Mapped UNC Path</button>
+            <button onclick="processPath(3)">Convert to macOS Path</button>
+
+            <div class="output-box" id="output"></div>
+            <div class="status" id="status"></div>
+
+            <button
+                id="open-btn"
+                style="
+                    display: none;
+                    margin-top: 20px;
+                    background-color: #2a2a2c;
+                    border-color: rgba(255, 255, 255, 0.1);
+                "
+            ></button>
+        </div>
+
+        <script src="script.js"></script>
+    </body>
+</html>

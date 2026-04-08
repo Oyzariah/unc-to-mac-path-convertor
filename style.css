@@ -1,0 +1,90 @@
+body {
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
+    background-color: #050505;
+    background-image: radial-gradient(
+        circle at 50% 0%,
+        #1a1a24 0%,
+        #050505 70%
+    );
+    display: flex;
+    flex-direction: column; /* Stacks the title and container */
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    color: #ffffff;
+    gap: 40px; /* Space between the giant title and the button box */
+}
+
+/* The massive, centered headline from the reference image */
+.main-title {
+    font-size: 3rem;
+    font-weight: 600;
+    color: #ffffff;
+    text-align: center;
+    margin: 0;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+    margin-bottom: 1%;
+}
+
+.container {
+    background: #0f0f11;
+    padding: 3.5rem 2.5rem;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    max-width: 480px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+button {
+    display: block;
+    width: 100%;
+    padding: 16px;
+    margin-bottom: 16px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #bfbfbf;
+    background-color: #1a1a1c;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+button:hover {
+    background-color: #ffffff;
+    color: #000000;
+    border-color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+}
+
+.output-box {
+    margin-top: 32px;
+    padding: 18px;
+    background-color: #080808;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    word-break: break-all;
+    min-height: 24px;
+    font-family: "JetBrains Mono", "Courier New", monospace;
+    font-size: 13px;
+    text-align: left;
+    color: #e0e0e0;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.status {
+    margin-top: 16px;
+    font-size: 14px;
+    font-weight: 500;
+    min-height: 20px;
+}
