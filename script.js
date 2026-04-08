@@ -1,27 +1,66 @@
-//Server root folder on Windows
-const BASE_1 = "\\\\TINA2-PC\\Users\\Other Share File";
-//Mapped server root folder on Windows
-const BASE_2 = "A:";
-//Server root folder on macOS
-const BASE_3 = "/Volumes/Users/Other Share File";
-
 let currentFinalPath = "";
 let currentTargetType = 0;
+
+// Auto-populate the drive letter dropdown when the app opens
+document.addEventListener("DOMContentLoaded", () => {
+    const select = document.getElementById("drive-letter");
+    for (let i = 65; i <= 90; i++) {
+        const letter = String.fromCharCode(i);
+        if (letter === 'C') continue; // Exclude C drive
+
+        const option = document.createElement("option");
+        option.value = letter + ":";
+        option.textContent = letter + ":\\";
+
+        if (letter === 'A') option.selected = true; // Default to A
+        select.appendChild(option);
+    }
+});
 
 async function processPath(targetType) {
     const outputEl = document.getElementById("output");
     const statusEl = document.getElementById("status");
     const openBtn = document.getElementById("open-btn");
 
-    // Hide open button whenever a new conversion starts
-    openBtn.style.display = "none";
+    // Use visibility instead of display
+    openBtn.style.visibility = "hidden";
+
+    // --- DYNAMIC BASE CALCULATION ---
+    const serverInput = document.getElementById("server-input").value.trim();
+    let mappedPathInput = document.getElementById("mapped-path").value.trim();
+    const driveLetter = document.getElementById("drive-letter").value;
+
+    // Safety check: Prevent conversion if Server Name is blank
+    if (!serverInput) {
+        showError("Please enter a Server Name");
+        return;
+    }
+
+    if (!mappedPathInput) {
+        mappedPathInput = serverInput;
+    }
+
+    const BASE_1 = mappedPathInput;
+    const BASE_2 = driveLetter;
+
+    let sharePath = "";
+    if (mappedPathInput.toLowerCase().startsWith(serverInput.toLowerCase())) {
+        sharePath = mappedPathInput.substring(serverInput.length);
+    } else {
+        sharePath = mappedPathInput;
+    }
+
+    sharePath = sharePath.replace(/\\/g, "/");
+    if (sharePath && !sharePath.startsWith("/")) {
+        sharePath = "/" + sharePath;
+    }
+
+    const BASE_3 = "/Volumes" + sharePath;
+    // --------------------------------
 
     try {
         const clipboardText = await navigator.clipboard.readText();
-
-        const inputPath = clipboardText
-            .trim()
-            .replace(/^["']|["']$/g, "");
+        const inputPath = clipboardText.trim().replace(/^["']|["']$/g, "");
 
         if (!inputPath) {
             showError("Clipboard is empty");
@@ -31,13 +70,13 @@ async function processPath(targetType) {
         let relativePath = "";
         let detectedType = 0;
 
-        if (inputPath.startsWith(BASE_1)) {
+        if (inputPath.toLowerCase().startsWith(BASE_1.toLowerCase())) {
             detectedType = 1;
             relativePath = inputPath.substring(BASE_1.length);
-        } else if (inputPath.startsWith(BASE_2)) {
+        } else if (inputPath.toLowerCase().startsWith(BASE_2.toLowerCase())) {
             detectedType = 2;
             relativePath = inputPath.substring(BASE_2.length);
-        } else if (inputPath.startsWith(BASE_3)) {
+        } else if (inputPath.toLowerCase().startsWith(BASE_3.toLowerCase())) {
             detectedType = 3;
             relativePath = inputPath.substring(BASE_3.length);
         } else {
@@ -62,7 +101,6 @@ async function processPath(targetType) {
             if (targetType === 3) finalPath = BASE_3;
         }
 
-        // Store current path and type for the "Open" button
         currentFinalPath = finalPath;
         currentTargetType = targetType;
 
@@ -74,19 +112,18 @@ async function processPath(targetType) {
         statusEl.textContent = `Copied to clipboard`;
         statusEl.style.color = "#4ade80";
 
-        // Setup and reveal the dynamic open button
         if (targetType === 3) {
             openBtn.textContent = "Open in Finder";
         } else {
             openBtn.textContent = "Open in Explorer";
         }
-        openBtn.style.display = "block";
+
+        // Show button securely without layout shift
+        openBtn.style.visibility = "visible";
 
     } catch (err) {
         console.error(err);
-        showError(
-            "Failed to read clipboard. Please ensure you have granted clipboard permissions.",
-        );
+        showError("Failed to read clipboard. Please ensure you have granted clipboard permissions.");
     }
 }
 
@@ -95,40 +132,36 @@ function showError(statusMsg, pathMsg = "") {
     const statusEl = document.getElementById("status");
     const openBtn = document.getElementById("open-btn");
 
-    openBtn.style.display = "none"; // Ensure button stays hidden on error
-
+    openBtn.style.visibility = "hidden"; // Keep hidden on error
     outputEl.innerText = pathMsg;
     outputEl.style.color = "#ff6b6b";
-
     statusEl.textContent = statusMsg;
     statusEl.style.color = "#ff6b6b";
 }
 
-// Listen for clicks on the Open Button
+// Add this function anywhere in your script.js
+function closeModal() {
+    document.getElementById('app-modal').classList.remove('active');
+}
+
+// Replace your existing "open-btn" event listener at the bottom with this:
 document.getElementById("open-btn").addEventListener("click", () => {
-    // Check if the user agent contains 'electron'
     const isElectron = /electron/i.test(navigator.userAgent);
-    
+
     if (!isElectron) {
-        // Trigger browser prompt if not in Electron app
-        alert("For installed app only");
+        // Trigger the custom modal instead of the browser alert
+        document.getElementById('app-modal').classList.add('active');
         return;
     }
 
-    // If running in Electron, execute the system command
     try {
-        // Method A: If Node integration is enabled in your Electron main.js
         if (typeof require !== 'undefined') {
             const { exec } = require('child_process');
-            // Use 'open' for macOS (3), 'explorer' for Windows (1 & 2)
-            const command = currentTargetType === 3 
-                ? `open "${currentFinalPath}"` 
+            const command = currentTargetType === 3
+                ? `open "${currentFinalPath}"`
                 : `explorer "${currentFinalPath}"`;
-            
             exec(command);
-        } 
-        // Method B: If using contextBridge (the modern, secure Electron way)
-        else if (window.electronAPI && window.electronAPI.openPath) {
+        } else if (window.electronAPI && window.electronAPI.openPath) {
             window.electronAPI.openPath(currentFinalPath, currentTargetType);
         } else {
             alert("Electron environment detected, but API is not configured properly.");
