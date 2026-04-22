@@ -11,8 +11,16 @@ window.onload = () => {
 function toggleConfig() {
     const content = document.getElementById("config-content");
     const arrow = document.getElementById("config-arrow");
+    
     content.classList.toggle("collapsed");
     arrow.classList.toggle("collapsed");
+
+    // Toggle body class based on whether it is collapsed
+    if (content.classList.contains("collapsed")) {
+        document.body.classList.remove("settings-open");
+    } else {
+        document.body.classList.add("settings-open");
+    }
 }
 
 function loadConfiguration() {
@@ -21,8 +29,7 @@ function loadConfiguration() {
     const autoOpen =
         localStorage.getItem("UNC_CONVERTER_AUTO_OPEN") === "true";
 
-    document.getElementById("auto-open-checkbox").checked =
-        autoOpen;
+    document.getElementById("auto-open-checkbox").checked = autoOpen;
 
     if (savedWin && savedMac) {
         BASE_WIN = savedWin;
@@ -37,6 +44,7 @@ function loadConfiguration() {
         document
             .getElementById("config-arrow")
             .classList.add("collapsed");
+        document.body.classList.remove("settings-open");
     } else {
         document
             .getElementById("config-content")
@@ -44,6 +52,7 @@ function loadConfiguration() {
         document
             .getElementById("config-arrow")
             .classList.remove("collapsed");
+        document.body.classList.add("settings-open");
     }
 }
 
@@ -98,15 +107,27 @@ function attemptSaveConfiguration() {
         .trim()
         .replace(/^["']|["']$/g, "");
 
-    if (winInput === BASE_WIN && macInput === BASE_MAC) {
+    // Prevent bypassing if both bases are currently empty
+    if (winInput === BASE_WIN && macInput === BASE_MAC && BASE_WIN !== "") {
         return true;
     }
 
+    // Explicit check for BOTH empty
+    if (!winInput && !macInput) {
+        clearConfigState();
+        showError(
+            "Missing example paths",
+            "Please provide example Windows and macOS paths.",
+        );
+        return false;
+    }
+
+    // Check if only one is empty
     if (!winInput || !macInput) {
         clearConfigState();
         showError(
             "Configuration Error",
-            "Please provide Windows and macOS paths.",
+            "Please provide both Windows and macOS paths.",
         );
         return false;
     }
@@ -115,8 +136,8 @@ function attemptSaveConfiguration() {
     if (!bases) {
         clearConfigState();
         showError(
-            "Configuration Error",
-            "Something is wrong with provided paths.",
+            "Invalid Example Path",
+            "Please check example path format.",
         );
         return false;
     }
@@ -135,17 +156,25 @@ function attemptSaveConfiguration() {
     if (!content.classList.contains("collapsed")) {
         content.classList.add("collapsed");
         arrow.classList.add("collapsed");
+        document.body.classList.remove("settings-open");
     }
 
     return true;
+}
+
+// Clears the manual input field
+function clearManualInput() {
+    const manualInput = document.getElementById("manual-path-input");
+    manualInput.value = "";
+    manualInput.focus();
 }
 
 async function processPath(targetType) {
     const outputEl = document.getElementById("output");
     const statusEl = document.getElementById("status");
     const openBtn = document.getElementById("open-btn");
-    const manualInput =
-        document.getElementById("manual-path-input");
+    const manualInput = document.getElementById("manual-path-input");
+    const manualInputWrapper = document.getElementById("manual-input-wrapper");
 
     openBtn.style.display = "none";
     statusEl.classList.remove("show");
@@ -157,49 +186,42 @@ async function processPath(targetType) {
         if (content.classList.contains("collapsed")) {
             content.classList.remove("collapsed");
             arrow.classList.remove("collapsed");
+            document.body.classList.add("settings-open");
         }
         return;
     }
 
     let inputPath = "";
+    let clipboardAccessible = false;
 
-    if (
-        manualInput.style.display !== "none" &&
-        manualInput.value.trim() !== ""
-    ) {
-        inputPath = manualInput.value
-            .trim()
-            .replace(/^["']|["']$/g, "");
+    // Check clipboard on EVERY convert attempt
+    try {
+        const clipboardText = await navigator.clipboard.readText();
+        inputPath = clipboardText.trim().replace(/^["']|["']$/g, "");
+        clipboardAccessible = true;
+    } catch (cbErr) {
+        console.warn("Clipboard read blocked by browser/OS.");
+        clipboardAccessible = false;
+    }
+
+    // Toggle manual input wrapper visibility based on clipboard access
+    if (clipboardAccessible) {
+        manualInputWrapper.style.display = "none";
     } else {
-        try {
-            const clipboardText =
-                await navigator.clipboard.readText();
-            inputPath = clipboardText
+        manualInputWrapper.style.display = "block";
+        // Fallback to manual input if we can't read the clipboard
+        if (manualInput.value.trim() !== "") {
+            inputPath = manualInput.value
                 .trim()
                 .replace(/^["']|["']$/g, "");
-
-            if (inputPath && manualInput.style.display !== "none") {
-                manualInput.value = inputPath;
-            }
-        } catch (cbErr) {
-            console.warn(
-                "Clipboard read blocked by browser.",
-            );
-            manualInput.style.display = "block";
-            showError(
-                "Clipboard Access Blocked",
-                "Please allow clipboard access or paste it here manually.",
-            );
-            manualInput.focus();
-            return;
         }
     }
 
     if (!inputPath) {
-        if (manualInput.style.display !== "none") {
+        if (!clipboardAccessible) {
             showError(
-                "No Input",
-                "Please paste a path in the input box.",
+                "Clipboard Access Blocked",
+                "Please allow clipboard access or paste the path \n manually.",
             );
             manualInput.focus();
         } else {
@@ -229,7 +251,7 @@ async function processPath(targetType) {
         } else {
             showError(
                 "Unknown Path Format",
-                "Path format does not match the path in setting.",
+                "Path format does not match the example path in setting.",
             );
             return;
         }
@@ -241,11 +263,15 @@ async function processPath(targetType) {
             finalPath = `${BASE_WIN}\\${relativePath.replace(/\//g, "\\")}`;
         } else if (targetType === "mac") {
             finalPath = `${BASE_MAC}/${relativePath.replace(/\\/g, "/")}`;
+            // Network formatting mapping
+            finalPath = finalPath.replace(/TINA2-PC/i, "Volumes");
         }
 
         if (relativePath === "") {
             if (targetType === "windows") finalPath = BASE_WIN;
-            if (targetType === "mac") finalPath = BASE_MAC;
+            if (targetType === "mac") {
+                finalPath = BASE_MAC.replace(/TINA2-PC/i, "Volumes");
+            }
         }
 
         currentFinalPath = finalPath;
@@ -323,10 +349,10 @@ function closeModal() {
     document.getElementById("app-modal").classList.remove("active");
 }
 
-function openConvertedPath() {
-    const isElectron = /electron/i.test(navigator.userAgent);
+async function openConvertedPath() {
+    const isTauri = !!window.__TAURI__;
 
-    if (!isElectron) {
+    if (!isTauri) {
         document
             .getElementById("app-modal")
             .classList.add("active");
@@ -345,27 +371,8 @@ function openConvertedPath() {
     }
 
     try {
-        if (typeof require !== "undefined") {
-            const { exec } = require("child_process");
-            const command =
-                currentTargetType === "mac"
-                    ? `open "${pathToOpen}"`
-                    : `explorer "${pathToOpen}"`;
-            exec(command);
-        } else if (
-            window.electronAPI &&
-            window.electronAPI.openPath
-        ) {
-            window.electronAPI.openPath(
-                pathToOpen,
-                currentTargetType,
-            );
-        } else {
-            showError(
-                "API Error",
-                "Electron environment detected, but API is not configured properly.",
-            );
-        }
+        const { invoke } = window.__TAURI__.core;
+        await invoke('open_path', { path: pathToOpen });
     } catch (err) {
         console.error("Failed to open path:", err);
         showError("Execution Error", "Error opening path.");
@@ -375,8 +382,8 @@ function openConvertedPath() {
 document
     .getElementById("auto-open-checkbox")
     .addEventListener("change", (e) => {
-        const isElectron = /electron/i.test(navigator.userAgent);
-        if (e.target.checked && !isElectron) {
+        const isTauri = !!window.__TAURI__;
+        if (e.target.checked && !isTauri) {
             e.target.checked = false;
             document
                 .getElementById("app-modal")

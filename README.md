@@ -1,1 +1,0 @@
-favicon: Flaticon.com

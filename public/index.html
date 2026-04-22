@@ -3,12 +3,15 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Win-Mac Path Converter</title>
+        <title>Server Path Converter</title>
+        <link rel="icon" type="image/png" href="icon.png" />
         <link rel="stylesheet" href="style.css" />
+    </head>
     <body>
         <h1 class="main-title">Server Path Converter</h1>
         <p class="subtitle">
-            This tool automatically reads and converts paths from your clipboard.
+            This tool automatically reads and converts paths from your
+            clipboard.
         </p>
 
         <div class="container">
@@ -49,7 +52,7 @@
                     </p>
 
                     <div class="settings-group">
-                        <label>Windows Path</label>
+                        <label>Example Windows Path</label>
                         <input
                             type="text"
                             id="win-example"
@@ -57,7 +60,7 @@
                         />
                     </div>
                     <div class="settings-group">
-                        <label>macOS Path</label>
+                        <label>Example macOS Path</label>
                         <input
                             type="text"
                             id="mac-example"
@@ -77,18 +80,42 @@
                 </div>
             </div>
 
-            <div class="action-buttons">
-                <button onclick="processPath('windows')">To Windows</button>
-                <button onclick="processPath('mac')">To macOS</button>
+            <!-- Main Input Area (Hidden by default, shown if clipboard fails) -->
+            <div
+                class="manual-input-container"
+                id="manual-input-wrapper"
+                style="display: none"
+            >
+                <input
+                    type="text"
+                    id="manual-path-input"
+                    placeholder="Paste path here to convert."
+                />
+                <button
+                    class="clear-input-btn"
+                    onclick="clearManualInput()"
+                    aria-label="Clear input"
+                >
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
             </div>
 
-            <!-- Main Input Area (Hidden by default, shown if clipboard fails) -->
-            <input
-                type="text"
-                id="manual-path-input"
-                placeholder="Paste path here to convert..."
-                style="display: none; margin-top: 4px; margin-bottom: 0"
-            />
+            <div class="action-buttons">
+                <button onclick="processPath('windows')">Windows Path</button>
+                <button onclick="processPath('mac')">macOS Path</button>
+            </div>
 
             <div class="output-box" id="output"></div>
             <div class="status" id="status"></div>

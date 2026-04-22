@@ -26,19 +26,26 @@ body {
     );
     display: flex;
     flex-direction: column;
-    justify-content: flex-start; /* Anchors to the top to stop the UI from jumping upwards */
+    justify-content: flex-start;
     align-items: center;
     min-height: 100vh;
     margin: 0;
-    /* Increased top padding from 12vh to 25vh to sit at the optical center */
-    padding: 25vh 20px 40px 20px;
+    /* Base padding */
+    padding: 22vh 20px 40px 20px;
     color: var(--text-main);
     gap: 32px;
     box-sizing: border-box;
+    /* Transition for smooth UI shifting */
+    transition: padding 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Shift the UI upwards when settings are open */
+body.settings-open {
+    padding-top: 6vh;
 }
 
 .main-title {
-    font-size: clamp(1.9rem, 4.7vw, 2.7rem);
+    font-size: clamp(2.2rem, 4.8vw, 3.1rem);
     font-weight: 600;
     text-align: center;
     margin: 0;
@@ -49,7 +56,7 @@ body {
 .subtitle {
     color: var(--text-muted);
     font-size: 14px;
-    margin-top: -22px;
+    margin-top: -28px;
     margin-bottom: 0;
     text-align: center;
     font-weight: 400;
@@ -125,6 +132,47 @@ button:active {
 
 .action-buttons button {
     margin-bottom: 0;
+}
+
+/* --- MANUAL INPUT WRAPPER --- */
+.manual-input-container {
+    position: relative;
+    width: 100%;
+    margin-bottom: 16px;
+}
+
+.manual-input-container input[type="text"] {
+    margin-bottom: 0;
+    padding-right: 42px;
+}
+
+.clear-input-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    padding: 6px;
+    margin: 0;
+    width: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.clear-input-btn:hover {
+    background: transparent;
+    border-color: transparent;
+    color: var(--text-main);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.clear-input-btn:active {
+    transform: translateY(-50%) scale(0.95);
 }
 
 /* --- SETTINGS SECTION --- */
