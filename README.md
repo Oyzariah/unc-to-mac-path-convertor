@@ -19,3 +19,5 @@ To build the app, install Node.js and Rust, run:
 npm install
 npx tauri build
 ```
+
+License: ISC
