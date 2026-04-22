@@ -1,171 +1,333 @@
+:root {
+    --bg-main: #050505;
+    --bg-container: #0f0f11;
+    --bg-input: #161618;
+    --bg-hover: #1e1e21;
+    --text-main: #ffffff;
+    --text-muted: #888888;
+    --accent: #ffffff;
+    --accent-hover: #e0e0e0;
+    --success: #4ade80;
+    --error: #ff6b6b;
+    --border: rgba(255, 255, 255, 0.06);
+}
+
 body {
     font-family:
         "Inter",
         system-ui,
         -apple-system,
         sans-serif;
-    background-color: #050505;
+    background-color: var(--bg-main);
     background-image: radial-gradient(
         circle at 50% 0%,
         #1a1a24 0%,
         #050505 70%
     );
     display: flex;
-    flex-direction: column; /* Stacks the title and container */
-    justify-content: center;
+    flex-direction: column;
+    justify-content: flex-start; /* Anchors to the top to stop the UI from jumping upwards */
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
     margin: 0;
-    color: #ffffff;
-    gap: 40px; /* Space between the giant title and the button box */
+    /* Increased top padding from 12vh to 25vh to sit at the optical center */
+    padding: 25vh 20px 40px 20px;
+    color: var(--text-main);
+    gap: 32px;
+    box-sizing: border-box;
 }
 
-/* The massive, centered headline from the reference image */
 .main-title {
-    font-size: 3rem;
+    font-size: clamp(1.9rem, 4.7vw, 2.7rem);
     font-weight: 600;
-    color: #ffffff;
     text-align: center;
     margin: 0;
     letter-spacing: -0.04em;
     line-height: 1.1;
 }
 
-/* --- NEW SUBTITLE STYLES --- */
 .subtitle {
-    color: #a0a0a0;
-    font-size: 15px;
-    margin-top: -24px;
-    margin-bottom: 2%;
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-top: -22px;
+    margin-bottom: 0;
     text-align: center;
     font-weight: 400;
+    max-width: 480px;
 }
 
 .container {
-    background: #0f0f11;
-    padding: 2rem 2.5rem 1.2rem 2.5rem;
+    background: var(--bg-container);
+    padding: 24px;
     border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     text-align: center;
     max-width: 480px;
     width: 100%;
     box-sizing: border-box;
-    margin-top: -42px;
+}
+
+/* --- INPUTS & BUTTONS --- */
+input[type="text"] {
+    width: 100%;
+    padding: 14px 16px;
+    background-color: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text-main);
+    font-size: 14px;
+    box-sizing: border-box;
+    outline: none;
+    transition: all 0.2s;
+    margin-bottom: 16px;
+}
+
+input[type="text"]:focus {
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.03);
+}
+
+input[type="text"]::placeholder {
+    color: #444444;
 }
 
 button {
     display: block;
     width: 100%;
-    padding: 16px;
-    margin-bottom: 16px;
-    font-size: 15px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    font-size: 14px;
     font-weight: 500;
     color: #bfbfbf;
-    background-color: #1a1a1c;
-    border: 1px solid rgba(255, 255, 255, 0.04);
+    background-color: var(--bg-input);
+    border: 1px solid var(--border);
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.2s ease-in-out;
 }
 
 button:hover {
-    background-color: #ffffff;
-    color: #000000;
-    border-color: #ffffff;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+    background-color: var(--bg-hover);
+    color: var(--text-main);
+    border-color: rgba(255, 255, 255, 0.15);
 }
 
-.output-box {
-    margin-top: 32px;
-    padding: 18px;
-    background-color: #080808;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+button:active {
+    transform: scale(0.98);
+}
+
+.action-buttons {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.action-buttons button {
+    margin-bottom: 0;
+}
+
+/* --- SETTINGS SECTION --- */
+.collapsible-section {
+    background: #121214;
+    border: 1px solid var(--border);
     border-radius: 12px;
-    word-break: break-all;
-    min-height: 24px;
-    font-family: "JetBrains Mono", "Courier New", monospace;
-    font-size: 13px;
-    text-align: left;
-    color: #e0e0e0;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    margin-bottom: 24px;
+    overflow: hidden;
 }
 
-.status {
-    margin-top: 16px;
-    font-size: 14px;
+.collapsible-header {
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
     font-weight: 500;
-    min-height: 20px;
+    font-size: 14px;
+    background: var(--bg-input);
+    transition: background 0.2s;
 }
 
-/* --- NEW SETTINGS STYLES --- */
+.collapsible-header:hover {
+    background: var(--bg-hover);
+}
+
+.header-title {
+    display: flex;
+    align-items: center;
+}
+
+.arrow {
+    margin-right: 12px;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    color: var(--text-muted);
+}
+
+.arrow.collapsed {
+    transform: rotate(-90deg);
+}
+
+.collapsible-content {
+    display: block;
+    transition:
+        max-height 0.3s ease-out,
+        opacity 0.3s ease-out,
+        padding 0.3s ease-out;
+    max-height: 600px;
+    padding: 16px 20px;
+    opacity: 1;
+}
+
+.collapsible-content.collapsed {
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    opacity: 0;
+    overflow: hidden;
+    border-top: none;
+}
+
 .settings-group {
     text-align: left;
-    margin-bottom: 16px;
 }
 
 .settings-group label {
     display: block;
     font-size: 13px;
     font-weight: 500;
-    color: #a0a0a0;
+    color: var(--text-muted);
     margin-bottom: 8px;
 }
 
-.settings-group input, 
-.settings-group select {
-    width: 100%;
-    padding: 12px;
-    background-color: #1a1a1c;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 8px;
-    color: #ffffff;
-    font-size: 14px;
-    box-sizing: border-box;
-    outline: none;
+/* --- CUSTOM TOGGLE SWITCH --- */
+.toggle-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    padding: 12px 16px;
+    background-color: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
     transition: border-color 0.2s;
 }
 
-.settings-group input:focus, 
-.settings-group select:focus {
-    border-color: #ffffff;
+.toggle-container:hover {
+    border-color: rgba(255, 255, 255, 0.15);
 }
 
-.settings-group input::placeholder {
-    color: #555555;
-}
-
-.drive-mapping {
-    display: flex;
-    gap: 12px;
-    align-items: center; /* Ensures the 'to' text is vertically centered */
-}
-
-.drive-mapping select {
-    width: 65px; /* Made thinner */
-    flex-shrink: 0;
-    cursor: pointer;
-    padding: 12px 8px; /* Adjusted padding to fit the thinner width */
-}
-
-/* New class for the 'to' text */
-.mapping-to {
-    color: #a0a0a0;
-    font-size: 14px;
+.toggle-text {
+    font-size: 13px;
     font-weight: 500;
+    color: var(--text-main);
 }
 
-.divider {
-    border: none;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-    margin: 24px 0;
+.toggle-wrapper {
+    position: relative;
+    width: 36px;
+    height: 20px;
+    flex-shrink: 0;
 }
 
-/* --- NEW MODAL STYLES --- */
+.toggle-wrapper input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+
+.toggle-slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #222225;
+    transition: 0.3s ease;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    box-sizing: border-box;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 14px;
+    width: 14px;
+    left: 3px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: var(--text-muted);
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 50%;
+}
+
+.toggle-wrapper input:checked + .toggle-slider {
+    background-color: var(--text-main);
+    border-color: var(--text-main);
+}
+
+.toggle-wrapper input:checked + .toggle-slider:before {
+    transform: translate(16px, -50%);
+    background-color: var(--bg-main);
+}
+
+/* --- OUTPUT --- */
+.output-box {
+    margin-top: 24px;
+    padding: 16px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 10px;
+    word-break: break-all;
+    min-height: 20px;
+    font-family: "JetBrains Mono", "Courier New", monospace;
+    font-size: 13px;
+    text-align: left;
+    color: var(--text-muted);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: color 0.2s;
+}
+
+.status {
+    font-size: 13px;
+    font-weight: 500;
+    height: 0;
+    opacity: 0;
+    margin-top: 0;
+    overflow: hidden;
+    transition: all 0.2s ease-in-out;
+}
+
+.status.show {
+    height: 20px;
+    opacity: 1;
+    margin-top: 16px;
+}
+
+#open-btn {
+    background-color: var(--bg-input);
+    color: var(--text-main);
+    border-color: var(--border);
+    font-weight: 600;
+    margin-top: 16px;
+    margin-bottom: 0;
+    display: none;
+}
+
+#open-btn:hover {
+    background-color: var(--text-main);
+    color: var(--bg-main);
+}
+
+/* --- MODAL --- */
 .modal-overlay {
     position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(5px);
     display: flex;
@@ -196,11 +358,11 @@ button:hover {
 .modal-content h3 {
     margin: 0 0 12px 0;
     font-size: 1.25rem;
-    color: #ffffff;
+    color: var(--text-main);
 }
 
 .modal-content p {
-    color: #a0a0a0;
+    color: var(--text-muted);
     font-size: 14px;
     margin-bottom: 28px;
     line-height: 1.5;
@@ -211,9 +373,9 @@ button:hover {
     gap: 12px;
 }
 
-.modal-actions button, 
+.modal-actions button,
 .modal-actions a {
-    margin-bottom: 0; /* Override global button margin */
+    margin-bottom: 0;
     flex: 1;
 }
 
@@ -230,12 +392,12 @@ button:hover {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 16px;
-    font-size: 15px;
+    padding: 14px 16px;
+    font-size: 14px;
     font-weight: 600;
-    color: #000000;
-    background-color: #ffffff;
-    border: 1px solid #ffffff;
+    color: var(--bg-main);
+    background-color: var(--text-main);
+    border: 1px solid var(--text-main);
     border-radius: 12px;
     text-decoration: none;
     transition: all 0.2s ease-in-out;
@@ -243,7 +405,7 @@ button:hover {
 }
 
 .download-btn:hover {
-    transform: translateY(-1px);
+    transform: scale(0.98);
     box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
-    background-color: #e0e0e0;
+    background-color: var(--accent-hover);
 }

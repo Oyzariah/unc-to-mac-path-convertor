@@ -3,51 +3,120 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Path System Converter</title>
+        <title>Win-Mac Path Converter</title>
         <link rel="stylesheet" href="style.css" />
-    </head>
     <body>
-        <h1 class="main-title">UNC Path Converter</h1>
-        <p class="subtitle">This website automatically reads file path from your clipboard</p>
+        <h1 class="main-title">Server Path Converter</h1>
+        <p class="subtitle">
+            This tool automatically reads and converts paths from your clipboard.
+        </p>
 
         <div class="container">
-            <div class="settings-group">
-                <label>Server Name</label>
-                <input type="text" id="server-input" placeholder="\\ServerName" value="" />
-            </div>
+            <!-- Server Configuration Section -->
+            <div class="collapsible-section">
+                <div class="collapsible-header" onclick="toggleConfig()">
+                    <div class="header-title">
+                        <svg
+                            class="arrow"
+                            id="config-arrow"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                        <span>Setting</span>
+                    </div>
+                </div>
+                <div class="collapsible-content collapsed" id="config-content">
+                    <p
+                        style="
+                            font-size: 13px;
+                            color: var(--text-muted);
+                            margin-top: 0;
+                            margin-bottom: 16px;
+                            text-align: left;
+                            line-height: 1.4;
+                        "
+                    >
+                        Paste the path of the <b>same folder</b> from both
+                        systems here.
+                    </p>
 
-            <div class="settings-group">
-                <label>Mapped Drive(optional)</label>
-                <div class="drive-mapping">
-                    <select id="drive-letter"></select>
-                    <span class="mapping-to">to</span>
-                    <input type="text" id="mapped-path" placeholder="\\Server\mapped\path" value="" />
+                    <div class="settings-group">
+                        <label>Windows Path</label>
+                        <input
+                            type="text"
+                            id="win-example"
+                            placeholder="\\ServerName\Share\Folder"
+                        />
+                    </div>
+                    <div class="settings-group">
+                        <label>macOS Path</label>
+                        <input
+                            type="text"
+                            id="mac-example"
+                            placeholder="/Volumes/Share/Folder"
+                        />
+                    </div>
+
+                    <label class="toggle-container" for="auto-open-checkbox">
+                        <span class="toggle-text"
+                            >Automatically open folder</span
+                        >
+                        <div class="toggle-wrapper">
+                            <input type="checkbox" id="auto-open-checkbox" />
+                            <div class="toggle-slider"></div>
+                        </div>
+                    </label>
                 </div>
             </div>
 
-            <hr class="divider" />
+            <div class="action-buttons">
+                <button onclick="processPath('windows')">To Windows</button>
+                <button onclick="processPath('mac')">To macOS</button>
+            </div>
 
-            <button onclick="processPath(1)">Convert to Windows UNC Path</button>
-            <button onclick="processPath(2)">Convert to Mapped UNC Path</button>
-            <button onclick="processPath(3)">Convert to macOS Path</button>
+            <!-- Main Input Area (Hidden by default, shown if clipboard fails) -->
+            <input
+                type="text"
+                id="manual-path-input"
+                placeholder="Paste path here to convert..."
+                style="display: none; margin-top: 4px; margin-bottom: 0"
+            />
 
             <div class="output-box" id="output"></div>
             <div class="status" id="status"></div>
-            
-            <button id="open-btn" style="visibility: hidden; margin-top: 20px; background-color: #2a2a2c; border-color: rgba(255, 255, 255, 0.1);"></button>
+
+            <button id="open-btn"></button>
         </div>
 
+        <!-- App Modal -->
         <div id="app-modal" class="modal-overlay">
             <div class="modal-content">
                 <h3>Desktop Version Required</h3>
-                <p>Opening folder is not supported in browser.<br>Please download the desktop version to use this feature.</p>
+                <p>
+                    Opening folder is not supported in web browser.<br />Please
+                    download the desktop version to use this feature.
+                </p>
                 <div class="modal-actions">
-                    <button class="close-btn" onclick="closeModal()">Cancel</button>
-                    <a href="https://github.com/Oyzariah/unc-to-mac-path-convertor/releases" target="_blank" class="download-btn">Download</a>
+                    <button class="close-btn" onclick="closeModal()">
+                        Cancel
+                    </button>
+                    <a
+                        href="https://github.com/Oyzariah/unc-to-mac-path-convertor/releases"
+                        target="_blank"
+                        class="download-btn"
+                        >Download</a
+                    >
                 </div>
             </div>
         </div>
-
-        <script src="script.js"></script>
     </body>
+    <script src="script.js"></script>
 </html>
